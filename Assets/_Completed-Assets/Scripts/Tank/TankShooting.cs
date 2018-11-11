@@ -43,7 +43,6 @@ namespace Complete
 
         private void Update ()
         {
-
             // The slider should have a default value of the minimum launch force.
             m_AimSlider.value = m_MinLaunchForce;
 
@@ -55,7 +54,7 @@ namespace Complete
                 Fire ();
             }
             // Otherwise, if the fire button has just started being pressed...
-            else if (Input.GetButtonDown (m_FireButton) || isTouchedTheScreenDown())
+            else if (Input.GetButtonDown (m_FireButton) || isScreenTouchedDown())
             {
                 // ... reset the fired flag and reset the launch force.
                 m_Fired = false;
@@ -66,7 +65,7 @@ namespace Complete
                 m_ShootingAudio.Play ();
             }
             // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
-            else if ((Input.GetButton (m_FireButton) && !m_Fired) || (isTouchedTheScreen() && !m_Fired))
+            else if ((Input.GetButton (m_FireButton) && !m_Fired) || (isScreenTouched() && !m_Fired))
             {
                 // Increment the launch force and update the slider.
                 m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
@@ -74,56 +73,13 @@ namespace Complete
                 m_AimSlider.value = m_CurrentLaunchForce;
             }
             // Otherwise, if the fire button is released and the shell hasn't been launched yet...
-            else if ((Input.GetButtonUp (m_FireButton) && !m_Fired) || (isTouchedTheScreenUp() && !m_Fired))
+            else if ((Input.GetButtonUp (m_FireButton) && !m_Fired) || (isScreenTouchedUp() && !m_Fired))
             {
                 // ... launch the shell.
                 Fire ();
             }
         }
 
-        bool isTouchedTheScreen()
-        {
-            var fingerCount = 0;
-            foreach (Touch touch in Input.touches)
-            {
-                if (touch.phase != TouchPhase.Ended && touch.phase != TouchPhase.Canceled)
-                {
-                    fingerCount++;
-                }
-            }
-            if (fingerCount > 0)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        bool isTouchedTheScreenDown()
-        {
-            if (Input.touchCount > 0)
-            {
-                Touch touch = Input.GetTouch(0);
-                if (touch.phase == TouchPhase.Began)
-                {
-                    return true;
-                }
-                return false;
-            }
-            return false;
-        }
-        bool isTouchedTheScreenUp()
-        {
-            if (Input.touchCount > 0)
-            {
-                Touch touch = Input.GetTouch(0);
-                if (touch.phase == TouchPhase.Ended)
-                {
-                    return true;
-                }
-                return false;
-            }
-            return false;
-        }
 
         private void Fire ()
         {
@@ -143,6 +99,47 @@ namespace Complete
 
             // Reset the launch force.  This is a precaution in case of missing button events.
             m_CurrentLaunchForce = m_MinLaunchForce;
+        }
+
+        public bool isScreenTouched()
+        {
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+                if (touch.phase != TouchPhase.Ended && touch.phase != TouchPhase.Canceled)
+                {
+                    return true;
+                }
+                return false;
+            }
+            
+            return false;
+        }
+
+        public bool isScreenTouchedDown()
+        {
+            if (Input.touchCount > 0)
+            {
+                if (Input.GetTouch(0).phase == TouchPhase.Began)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        public bool isScreenTouchedUp()
+        {
+            if (Input.touchCount > 0)
+            {
+                if (Input.GetTouch(0).phase == TouchPhase.Ended)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
     }
 }
